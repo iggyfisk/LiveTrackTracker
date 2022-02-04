@@ -3,6 +3,7 @@
 # [START gae_python3_app]
 
 from flask import Flask, request, redirect
+from werkzeug.middleware.proxy_fix import ProxyFix
 from google.cloud import ndb
 from parse import get_livetrack_urls
 from entities import Visit, Activity
@@ -19,6 +20,7 @@ def ndb_wsgi_middleware(wsgi_app):
 
 app = Flask(__name__)
 # Wrap the app in middleware.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)
 app.wsgi_app = ndb_wsgi_middleware(app.wsgi_app)
 
 @app.route('/')
